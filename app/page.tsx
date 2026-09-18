@@ -1,126 +1,32 @@
 "use client";
 
-import { FormEvent, useMemo, useState } from "react";
+import { ArrowUpRight, CheckCircle2, Wrench } from "lucide-react";
 
-type Result = {
-  link: string;
-  success: boolean;
-  id?: string;
-  error?: string;
+type Tool = {
+  name: string;
+  description: string;
+  url: string;
+  status: "available" | "coming-soon";
 };
 
+const tools: Tool[] = [
+  {
+    name: "RoCheck",
+    description:
+      "Check Roblox group membership quickly and efficiently.",
+    url: "https://rocheck.vercel.app/",
+    status: "available",
+  },
+  {
+    name: "RoLink Resolver",
+    description:
+      "Resolve Roblox Share Links and extract their Roblox IDs.",
+    url: "https://rolinkresolver.vercel.app/",
+    status: "available",
+  },
+];
+
 export default function Home() {
-  const [mode, setMode] = useState<"single" | "bulk">("single");
-  const [input, setInput] = useState("");
-  const [results, setResults] = useState<Result[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [copiedId, setCopiedId] = useState<string | null>(null);
-  const [copiedAll, setCopiedAll] = useState(false);
-  const [error, setError] = useState("");
-
-  const links = useMemo(() => {
-    return [...new Set(
-      input
-        .split(/\r?\n/)
-        .map((line) => line.trim())
-        .filter(Boolean)
-    )];
-  }, [input]);
-
-  const successCount = results.filter((result) => result.success).length;
-
-  async function handleResolve(event: FormEvent) {
-    event.preventDefault();
-
-    setResults([]);
-    setError("");
-    setCopiedAll(false);
-
-    const linksToResolve =
-      mode === "single"
-        ? [input.trim()].filter(Boolean)
-        : links;
-
-    if (linksToResolve.length === 0) {
-      setError("Paste at least one Roblox share link.");
-      return;
-    }
-
-    if (linksToResolve.length > 50) {
-      setError("Maximum 50 links per request.");
-      return;
-    }
-
-    setLoading(true);
-
-    try {
-      const response = await fetch("/api/resolve", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          links: linksToResolve,
-        }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok || !data.success) {
-        setError(data.error || "Failed to resolve links.");
-        return;
-      }
-
-      setResults(data.results || []);
-    } catch {
-      setError("Unable to connect to the resolver.");
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  async function copyId(id: string) {
-    await navigator.clipboard.writeText(id);
-
-    setCopiedId(id);
-
-    setTimeout(() => {
-      setCopiedId(null);
-    }, 1500);
-  }
-
-  async function copyAllIds() {
-    const ids = results
-      .filter((result) => result.success && result.id)
-      .map((result) => result.id)
-      .join("\n");
-
-    if (!ids) return;
-
-    await navigator.clipboard.writeText(ids);
-
-    setCopiedAll(true);
-
-    setTimeout(() => {
-      setCopiedAll(false);
-    }, 1500);
-  }
-
-  function clearAll() {
-    setInput("");
-    setResults([]);
-    setError("");
-    setCopiedAll(false);
-  }
-
-  function changeMode(nextMode: "single" | "bulk") {
-    setMode(nextMode);
-    setInput("");
-    setResults([]);
-    setError("");
-    setCopiedAll(false);
-  }
-
   return (
     <main className="page">
       <div className="container">
@@ -130,211 +36,111 @@ export default function Home() {
             <span>RoKit</span>
           </div>
 
-          <span className="badge">Share Link Resolver</span>
+          <span className="badge">ROBLOX TOOLS</span>
         </header>
 
         <section className="hero">
-          <p className="eyebrow">ROBLOX DEVELOPER TOOL</p>
+          <p className="eyebrow">ROBLOX DEVELOPER TOOLKIT</p>
 
           <h1>
-            Share Link
+            Simple tools.
             <br />
-            <span>Resolver</span>
+            <span>Built for Roblox.</span>
           </h1>
 
           <p className="description">
-            Convert Roblox share links into their corresponding
-            Roblox IDs.
+            A collection of lightweight Roblox utilities and developer
+            tools, built to make everyday tasks faster and easier.
           </p>
+        </section>
 
-          <div className="mode-switch">
-            <button
-              type="button"
-              className={mode === "single" ? "active" : ""}
-              onClick={() => changeMode("single")}
-              disabled={loading}
-            >
-              Single
-            </button>
+        <section className="tools-section">
+          <div className="section-header">
+            <div>
+              <span className="section-label">TOOLS</span>
+              <h2>Available tools</h2>
+            </div>
 
-            <button
-              type="button"
-              className={mode === "bulk" ? "active" : ""}
-              onClick={() => changeMode("bulk")}
-              disabled={loading}
-            >
-              Bulk
-            </button>
+            <span className="tool-count">
+              {tools.filter((tool) => tool.status === "available").length}{" "}
+              available
+            </span>
           </div>
 
-          <form onSubmit={handleResolve} className="resolver">
-            <label htmlFor="share-link">
-              {mode === "single"
-                ? "Roblox Share Link"
-                : "Roblox Share Links"}
-            </label>
+          <div className="tools-grid">
+            {tools.map((tool) => (
+              <a
+                key={tool.name}
+                href={tool.status === "available" ? tool.url : undefined}
+                target={tool.status === "available" ? "_blank" : undefined}
+                rel={
+                  tool.status === "available"
+                    ? "noopener noreferrer"
+                    : undefined
+                }
+                className={`tool-card ${
+                  tool.status === "coming-soon" ? "disabled" : ""
+                }`}
+                aria-disabled={tool.status === "coming-soon"}
+              >
+                <div className="tool-card-top">
+                  <div className="tool-icon">
+                    {tool.status === "available" ? (
+                      <CheckCircle2 size={20} />
+                    ) : (
+                      <Wrench size={20} />
+                    )}
+                  </div>
 
-            {mode === "single" ? (
-              <div className="input-row">
-                <input
-                  id="share-link"
-                  type="url"
-                  placeholder="https://www.roblox.com/share?code=..."
-                  value={input}
-                  onChange={(event) => setInput(event.target.value)}
-                  disabled={loading}
-                />
-
-                <button type="submit" disabled={loading}>
-                  {loading ? "Resolving..." : "Resolve"}
-                </button>
-              </div>
-            ) : (
-              <>
-                <textarea
-                  id="share-link"
-                  placeholder={
-                    "Paste one Roblox share link per line...\n\nhttps://www.roblox.com/share?code=...\nhttps://www.roblox.com/share?code=...\nhttps://www.roblox.com/share?code=..."
-                  }
-                  value={input}
-                  onChange={(event) => setInput(event.target.value)}
-                  disabled={loading}
-                  spellCheck={false}
-                />
-
-                <div className="bulk-meta">
-                  <span>
-                    {links.length}{" "}
-                    {links.length === 1 ? "link" : "links"}
-                  </span>
-
-                  <span>Maximum 50</span>
-                </div>
-
-                <div className="bulk-actions">
-                  <button type="submit" disabled={loading}>
-                    {loading
-                      ? "Resolving..."
-                      : `Resolve ${links.length > 1 ? `${links.length} Links` : "Links"}`}
-                  </button>
-
-                  {input && !loading && (
-                    <button
-                      type="button"
-                      className="secondary-button"
-                      onClick={clearAll}
-                    >
-                      Clear
-                    </button>
+                  {tool.status === "available" ? (
+                    <ArrowUpRight size={20} className="tool-arrow" />
+                  ) : (
+                    <span className="coming-soon">COMING SOON</span>
                   )}
                 </div>
-              </>
-            )}
-          </form>
 
-          {loading && mode === "bulk" && (
-            <div className="loading-box">
-              <div className="loading-spinner" />
-              <div>
-                <strong>Resolving links...</strong>
-                <span>
-                  Roblox API requests are being processed.
-                </span>
-              </div>
-            </div>
-          )}
-
-          {results.length > 0 && (
-            <div className="results-section">
-              <div className="results-header">
-                <div>
-                  <span className="result-label">RESULTS</span>
-
-                  <strong>
-                    {successCount} / {results.length} resolved
-                  </strong>
+                <div className="tool-content">
+                  <h3>{tool.name}</h3>
+                  <p>{tool.description}</p>
                 </div>
 
-                {successCount > 0 && (
-                  <button
-                    type="button"
-                    className="copy-all-button"
-                    onClick={copyAllIds}
-                  >
-                    {copiedAll ? "Copied All" : "Copy All IDs"}
-                  </button>
-                )}
-              </div>
+                <div className="tool-status">
+                  <span
+                    className={
+                      tool.status === "available"
+                        ? "status-dot available"
+                        : "status-dot"
+                    }
+                  />
+                  <span>
+                    {tool.status === "available"
+                      ? "Available"
+                      : "Coming soon"}
+                  </span>
+                </div>
+              </a>
+            ))}
+          </div>
+        </section>
 
-              <div className="results-list">
-                {results.map((result, index) => (
-                  <div
-                    className="result-row"
-                    key={`${result.link}-${index}`}
-                  >
-                    <div className="result-number">
-                      {String(index + 1).padStart(2, "0")}
-                    </div>
+        <section className="future-section">
+          <div className="future-icon">
+            <Wrench size={18} />
+          </div>
 
-                    <div className="result-link">
-                      <span>{result.link}</span>
-                    </div>
-
-                    <div className="result-id">
-                      {result.success && result.id ? (
-                        <>
-                          <strong>{result.id}</strong>
-
-                          <button
-                            type="button"
-                            onClick={() => copyId(result.id!)}
-                          >
-                            {copiedId === result.id
-                              ? "Copied"
-                              : "Copy"}
-                          </button>
-                        </>
-                      ) : (
-                        <span className="failed">
-                          {result.error || "Failed"}
-                        </span>
-                      )}
-                    </div>
-
-                    <div
-                      className={
-                        result.success
-                          ? "status success"
-                          : "status failed-status"
-                      }
-                    >
-                      {result.success ? "✓" : "×"}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {error && (
-            <div className="error">
-              {error}
-            </div>
-          )}
-
-          <div className="info">
-            <span>50 links max</span>
-            <span>•</span>
-            <span>One link per line</span>
-            <span>•</span>
-            <span>Duplicates removed automatically</span>
+          <div>
+            <strong>More tools are coming.</strong>
+            <p>
+              RoKit will continue to grow with more utilities for Roblox
+              developers and users.
+            </p>
           </div>
         </section>
 
         <footer>
           <span>RoKit</span>
           <span>•</span>
-          <span>Share Link Resolver</span>
+          <span>Roblox Tools</span>
         </footer>
       </div>
     </main>
