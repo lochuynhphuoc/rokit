@@ -105,8 +105,16 @@ export async function GET() {
     const tools = await readToolsFromDb();
 
     return NextResponse.json({ tools });
-  } catch {
-    return NextResponse.json({ tools: [] });
+  } catch (error) {
+    console.error("GET /api/tools error:", error);
+
+    return NextResponse.json(
+      {
+        error: error instanceof Error ? error.message : "Unknown error",
+        tools: [],
+      },
+      { status: 500 }
+    );
   }
 }
 
@@ -241,6 +249,8 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ tools });
   } catch (error) {
+    console.error("POST /api/tools error:", error);
+
     return NextResponse.json(
       {
         error: error instanceof Error ? error.message : "Unknown error",
