@@ -10,6 +10,7 @@ export type Tool = {
   url: string;
   icon: string;
   status: ToolStatus;
+  order: number;
 };
 
 let cachedClient: MongoClient | null = null;
@@ -36,6 +37,7 @@ function getWebsiteIcon(url: string) {
 
 async function getClient() {
   const uri = process.env.MONGODB_URI;
+
   if (!uri) {
     throw new Error("MONGODB_URI is not configured");
   }
@@ -48,7 +50,11 @@ async function getClient() {
   return cachedClient;
 }
 
-function normalizeTool(raw: Partial<Tool> | undefined, fallbackId?: string): Tool {
+function normalizeTool(
+  raw: Partial<Tool> | undefined,
+  fallbackId?: string,
+  fallbackOrder = 0
+): Tool {
   const id = String(raw?.id || fallbackId || "tool");
 
   return {
@@ -58,24 +64,46 @@ function normalizeTool(raw: Partial<Tool> | undefined, fallbackId?: string): Too
     url: String(raw?.url || "#"),
     icon: getWebsiteIcon(String(raw?.url || "")),
     status: raw?.status === "unavailable" ? "unavailable" : "available",
+    order:
+      typeof raw?.order === "number" && Number.isFinite(raw.order)
+        ? raw.order
+        : fallbackOrder,
   };
 }
 
 async function readToolsFromDb(): Promise<Tool[]> {
   const client = await getClient();
   const collection = client.db("rokit").collection("tools");
-  const docs = await collection.find({}).sort({ name: 1 }).toArray();
+
+  const docs = await collection.find({}).toArray();
 
   if (!docs.length) {
     return [];
   }
 
-  return docs.map((doc) => normalizeTool(doc as Partial<Tool>, String(doc._id || doc.id || "tool")));
+  const tools = docs.map((doc, index) =>
+    normalizeTool(
+      doc as Partial<Tool>,
+      String(doc._id || doc.id || `tool-${index}`),
+      index
+    )
+  );
+
+  tools.sort((a, b) => {
+    if (a.order !== b.order) {
+      return a.order - b.order;
+    }
+
+    return a.name.localeCompare(b.name);
+  });
+
+  return tools;
 }
 
 export async function GET() {
   try {
     const tools = await readToolsFromDb();
+
     return NextResponse.json({ tools });
   } catch {
     return NextResponse.json({ tools: [] });
@@ -97,37 +125,127 @@ export async function POST(request: NextRequest) {
 
     if (action === "list") {
       const tools = await readToolsFromDb();
+
       return NextResponse.json({ tools });
     }
 
     if (action === "add") {
-      const tool = normalizeTool(body.tool, `tool-${Date.now()}`);
-      await collection.updateOne({ id: tool.id }, { $set: tool }, { upsert: true });
+      const currentTools = await readToolsFromDb();
+
+      const tool = normalizeTool(
+        body.tool,
+        `tool-${Date.now()}`,
+        currentTools.length
+      );
+
+      tool.order = currentTools.length;
+
+      await collection.updateOne(
+        { id: tool.id },
+        { $set: tool },
+        { upsert: true }
+      );
+
       const tools = await readToolsFromDb();
-      return NextResponse.json({ success: true, tools });
+
+      return NextResponse.json({
+        success: true,
+        tools,
+      });
     }
 
     if (action === "update") {
-      const tool = normalizeTool(body.tool, String(body.tool?.id || "tool"));
-      await collection.updateOne({ id: tool.id }, { $set: tool }, { upsert: true });
+      const tool = normalizeTool(
+        body.tool,
+        String(body.tool?.id || "tool"),
+        0
+      );
+
+      const existingTool = await collection.findOne({ id: tool.id });
+
+      if (existingTool && typeof existingTool.order === "number") {
+        tool.order = existingTool.order;
+      }
+
+      await collection.updateOne(
+        { id: tool.id },
+        { $set: tool },
+        { upsert: true }
+      );
+
       const tools = await readToolsFromDb();
-      return NextResponse.json({ success: true, tools });
+
+      return NextResponse.json({
+        success: true,
+        tools,
+      });
+    }
+
+    if (action === "reorder") {
+      const orders = Array.isArray(body.orders) ? body.orders : [];
+
+      for (const item of orders) {
+        if (!item || !item.id) {
+          continue;
+        }
+
+        await collection.updateOne(
+          { id: String(item.id) },
+          {
+            $set: {
+              order: Number(item.order),
+            },
+          }
+        );
+      }
+
+      const tools = await readToolsFromDb();
+
+      return NextResponse.json({
+        success: true,
+        tools,
+      });
     }
 
     if (action === "delete") {
       const id = String(body.id || "");
+
       if (id) {
         await collection.deleteOne({ id });
       }
+
+      const remainingTools = await readToolsFromDb();
+
+      await Promise.all(
+        remainingTools.map((tool, index) =>
+          collection.updateOne(
+            { id: tool.id },
+            {
+              $set: {
+                order: index,
+              },
+            }
+          )
+        )
+      );
+
       const tools = await readToolsFromDb();
-      return NextResponse.json({ success: true, tools });
+
+      return NextResponse.json({
+        success: true,
+        tools,
+      });
     }
 
     const tools = await readToolsFromDb();
+
     return NextResponse.json({ tools });
   } catch (error) {
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : "Unknown error", tools: [] },
+      {
+        error: error instanceof Error ? error.message : "Unknown error",
+        tools: [],
+      },
       { status: 500 }
     );
   }
