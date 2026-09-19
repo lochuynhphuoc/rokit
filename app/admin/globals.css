@@ -1,0 +1,854 @@
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+  background: #08090b;
+  color: #f5f5f5;
+  font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+}
+
+body {
+  min-height: 100vh;
+}
+
+button,
+input,
+textarea {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+.admin-shell {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 32px 20px;
+  background: radial-gradient(circle at 50% 0%, rgba(34, 197, 94, 0.1), transparent 32%), #08090b;
+}
+
+.admin-box {
+  width: min(900px, 100%);
+  padding: 30px;
+  border: 1px solid #202126;
+  border-radius: 18px;
+  background: rgba(13, 14, 17, 0.94);
+  box-shadow: 0 22px 70px rgba(0, 0, 0, 0.35);
+}
+
+.login-box {
+  width: min(460px, 100%);
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 28px;
+  color: #9ca3af;
+  font-size: 12px;
+  text-decoration: none;
+}
+
+.back-link:hover {
+  color: #fff;
+}
+
+.eyebrow {
+  margin: 0 0 10px;
+  color: #7d818a;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+}
+
+.admin-box h1,
+.edit-modal h2 {
+  margin: 0;
+  color: #f5f5f5;
+  letter-spacing: -0.05em;
+}
+
+.admin-box h1 {
+  font-size: clamp(30px, 4vw, 44px);
+}
+
+.admin-box input,
+.edit-modal input,
+.edit-modal textarea {
+  width: 100%;
+  padding: 12px 13px;
+  border: 1px solid #2a2d33;
+  border-radius: 9px;
+  outline: none;
+  background: #090a0c;
+  color: #fff;
+}
+
+.login-box input {
+  margin-top: 22px;
+}
+
+.login-box .password-field input {
+  margin-top: 0;
+}
+
+.admin-box input:focus,
+.edit-modal input:focus,
+.edit-modal textarea:focus {
+  border-color: #22c55e;
+}
+
+.primary-button,
+.add-button,
+.logout-button,
+.icon-button,
+.status-switch {
+  border: 0;
+  transition: border-color 160ms ease, background 160ms ease, color 160ms ease, transform 160ms ease;
+}
+
+.primary-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  margin-top: 14px;
+  padding: 12px 16px;
+  border-radius: 9px;
+  background: #22c55e;
+  color: #061109;
+  font-weight: 750;
+}
+
+.primary-button:hover,
+.add-button:hover {
+  background: #34d46b;
+}
+
+.primary-button:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 14px 30px rgba(34, 197, 94, 0.26);
+}
+
+.loading-icon {
+  animation: admin-spin 0.8s linear infinite;
+}
+
+@keyframes admin-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.primary-button:disabled {
+  cursor: wait;
+  opacity: 0.6;
+}
+
+.admin-message {
+  margin: 16px 0 0;
+  color: #a7f3d0;
+  font-size: 13px;
+}
+
+.error-message {
+  color: #fca5a5;
+}
+
+.admin-header-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 26px;
+}
+
+.admin-header-row .back-link {
+  margin-bottom: 22px;
+}
+
+.logout-button {
+  flex: 0 0 auto;
+  padding: 8px 12px;
+  border: 1px solid #26302a;
+  border-radius: 8px;
+  background: #12351e;
+  color: #86efac;
+  font-size: 12px;
+}
+
+.logout-button:hover {
+  background: #174b28;
+}
+
+.admin-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 14px;
+  color: #7d818a;
+  font-size: 12px;
+}
+
+.add-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 10px 13px;
+  border-radius: 9px;
+  background: #22c55e;
+  color: #061109;
+  font-size: 12px;
+  font-weight: 750;
+}
+
+.tool-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.empty-state {
+  margin: 12px 0;
+  color: #777b84;
+  font-size: 13px;
+}
+
+.tool-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  min-height: 70px;
+  padding: 13px 14px;
+  border: 1px solid #202328;
+  border-radius: 12px;
+  background: #0b0c0f;
+}
+
+.tool-row-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.tool-row-left img {
+  width: 40px;
+  height: 40px;
+  flex: 0 0 40px;
+  object-fit: cover;
+  border: 1px solid #2a2d33;
+  border-radius: 10px;
+}
+
+.tool-row-left strong,
+.tool-row-left small {
+  display: block;
+  overflow: hidden;
+  max-width: 430px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tool-row-left strong {
+  margin-bottom: 5px;
+  color: #f3f4f6;
+  font-size: 13px;
+}
+
+.tool-row-left small {
+  color: #777d87;
+  font-size: 11px;
+}
+
+.tool-row-controls {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  flex: 0 0 auto;
+}
+
+.status-switch {
+  appearance: none;
+  width: 42px;
+  height: 24px;
+  padding: 3px;
+  border: 1px solid #5b292d;
+  border-radius: 999px;
+  background: #321619;
+}
+
+.status-switch span {
+  display: block;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #ef4444;
+  transition: transform 160ms ease, background 160ms ease;
+}
+
+.status-switch.is-on {
+  border-color: rgba(34, 197, 94, 0.55);
+  background: #12351e;
+}
+
+.status-switch.is-on span {
+  transform: translateX(17px);
+  background: #22c55e;
+}
+
+.status-switch:focus-visible,
+.icon-button:focus-visible,
+.primary-button:focus-visible,
+.add-button:focus-visible,
+.logout-button:focus-visible {
+  outline: 2px solid #86efac;
+  outline-offset: 2px;
+}
+
+.status-label {
+  min-width: 72px;
+  color: #aeb2b9;
+  font-size: 12px;
+}
+
+.status-label.available {
+  color: #86efac;
+}
+
+.status-label.unavailable {
+  color: #fca5a5;
+}
+
+.icon-button {
+  display: inline-grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: transparent;
+  color: #aeb2b9;
+}
+
+.icon-button:hover {
+  border-color: #30343b;
+  background: #17191e;
+}
+
+.delete-icon {
+  color: #ef4444;
+}
+
+.delete-icon:hover {
+  border-color: rgba(239, 68, 68, 0.35);
+  background: rgba(127, 29, 29, 0.22);
+}
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgba(0, 0, 0, 0.76);
+}
+
+.edit-modal {
+  width: min(520px, 100%);
+  max-height: calc(100vh - 40px);
+  overflow-y: auto;
+  padding: 26px;
+  border: 1px solid #292c32;
+  border-radius: 16px;
+  background: #0d0e11;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.55);
+}
+
+.modal-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.edit-modal h2 {
+  font-size: 25px;
+}
+
+.edit-modal label {
+  display: block;
+  margin-top: 15px;
+  color: #aeb2b9;
+  font-size: 12px;
+}
+
+.edit-modal input,
+.edit-modal textarea {
+  display: block;
+  margin-top: 7px;
+}
+
+.edit-modal textarea {
+  min-height: 96px;
+  resize: vertical;
+}
+
+.modal-status-row {
+  display: flex !important;
+  align-items: center;
+  gap: 10px;
+}
+
+.modal-status-row .status-switch {
+  margin-left: 5px;
+}
+
+.tools-loading {
+  color: #777b84;
+  font-size: 13px;
+}
+
+@media (max-width: 640px) {
+  .admin-shell {
+    align-items: start;
+    padding: 18px 12px;
+  }
+
+  .admin-box,
+  .edit-modal {
+    padding: 20px;
+  }
+
+  .admin-header-row,
+  .tool-row {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .logout-button {
+    align-self: flex-end;
+    margin-top: -52px;
+  }
+
+  .tool-row {
+    gap: 14px;
+  }
+
+  .tool-row-controls {
+    width: 100%;
+    justify-content: flex-start;
+  }
+}
+
+/* Dark RoKit overrides for the RoCheck-inspired admin layout. */
+.admin-shell {
+  background: radial-gradient(circle at 50% 0%, rgba(34, 197, 94, 0.1), transparent 32%), #08090b;
+}
+
+.admin-eyebrow {
+  color: #9ae6b4;
+}
+
+.admin-eyebrow span {
+  background: #22c55e;
+  box-shadow: 0 0 0 5px rgba(34, 197, 94, 0.14);
+}
+
+.admin-box input,
+.edit-modal input,
+.edit-modal textarea {
+  border-color: #2a2d33;
+  background: #090a0c;
+}
+
+.admin-box input:focus,
+.edit-modal input:focus,
+.edit-modal textarea:focus {
+  border-color: #22c55e;
+  box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.12);
+}
+
+.password-field {
+  position: relative;
+  margin-top: 22px;
+}
+
+.password-field input {
+  height: 46px;
+  margin-top: 0;
+  padding-right: 48px;
+}
+
+.password-toggle {
+  position: absolute;
+  top: 0;
+  right: 7px;
+  display: inline-grid;
+  width: 34px;
+  height: 46px;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: #7d818a;
+  line-height: 0;
+}
+
+.password-toggle:hover {
+  background: transparent;
+  color: #d7d9dd;
+}
+
+.password-toggle:focus,
+.password-toggle:focus-visible {
+  outline: none;
+  background: transparent;
+  box-shadow: none;
+}
+
+.primary-button {
+  gap: 8px;
+  background: #22c55e;
+  color: #061109;
+  box-shadow: 0 10px 24px rgba(34, 197, 94, 0.18);
+  height: 46px;
+  padding: 0 16px;
+}
+
+.primary-button:hover,
+.add-button:hover {
+  background: #34d46b;
+}
+
+.home-link {
+  display: flex;
+  width: 100%;
+  height: 46px;
+  align-items: center;
+  justify-content: center;
+  border-color: transparent;
+  margin: 15px auto 0;
+  padding: 0 16px;
+  border: 1px solid transparent;
+  border-radius: 9px;
+  background: transparent;
+  color: #aeb2b9;
+}
+
+.home-link:hover {
+  border-color: transparent;
+  background: transparent;
+  color: #d7d9dd;
+}
+
+.home-button:hover {
+  border-color: rgba(34, 197, 94, 0.45);
+  background: rgba(16, 24, 19, 0.94);
+  color: #9ae6b4;
+}
+
+.logout-button {
+  gap: 7px;
+  border-color: rgba(239, 68, 68, 0.3);
+  background: rgba(239, 68, 68, 0.12);
+  color: #fca5a5;
+}
+
+.logout-button:hover {
+  background: rgba(239, 68, 68, 0.22);
+  color: #fecaca;
+}
+
+/* Final login alignment overrides */
+.login-box .password-field input {
+  margin-top: 0;
+}
+
+/* Ro-Check-inspired admin visual system */
+.admin-shell {
+  background:
+    linear-gradient(115deg, rgba(10, 5, 9, 0.9), rgba(39, 8, 28, 0.72)),
+    url("https://images.unsplash.com/photo-1654331046188-a73586da7ed6?q=80&w=1170&auto=format&fit=crop");
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+}
+
+.admin-box {
+  width: min(1100px, 100%);
+  padding: 30px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.login-box {
+  width: min(480px, 100%);
+  padding: 42px;
+}
+
+.admin-eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin: 0 0 14px;
+  color: #ff9fc8;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.admin-eyebrow span {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #ff9fc8;
+  box-shadow: 0 0 0 5px rgba(255, 159, 200, 0.14);
+}
+
+.admin-box h1 {
+  font-family: var(--font-geist-sans), Inter, sans-serif;
+  color: #f1f5e9;
+  font-size: clamp(32px, 4vw, 44px);
+  letter-spacing: -0.06em;
+}
+
+.admin-box input,
+.edit-modal input,
+.edit-modal textarea {
+  border-color: rgba(255, 190, 220, 0.16);
+  border-radius: 13px;
+  background: #100b0f;
+}
+
+.admin-box input::placeholder,
+.edit-modal input::placeholder,
+.edit-modal textarea::placeholder {
+  color: #8f7d88;
+}
+
+.admin-box input:focus,
+.edit-modal input:focus,
+.edit-modal textarea:focus {
+  border-color: #ff9fc8;
+  box-shadow: 0 0 0 4px rgba(255, 159, 200, 0.12);
+}
+
+.login-box input {
+  margin-top: 22px;
+}
+
+.primary-button,
+.add-button {
+  border-radius: 13px;
+  background: #ff9fc8;
+  color: #28131e;
+  box-shadow: 0 10px 24px rgba(255, 159, 200, 0.2);
+}
+
+.primary-button:hover,
+.add-button:hover {
+  background: #ffc0da;
+}
+
+.login-box .back-link {
+  justify-content: center;
+  margin: 15px 0 0;
+  color: #b5a5ae;
+}
+
+.login-box .back-link:hover {
+  color: #ff9fc8;
+}
+
+.admin-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.home-button,
+.logout-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border: 1px solid rgba(255, 190, 220, 0.16);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.045);
+  color: #dec4d1;
+  font-size: 12px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.home-button:hover {
+  border-color: rgba(255, 159, 200, 0.38);
+  background: rgba(255, 92, 170, 0.1);
+  color: #ff9fc8;
+}
+
+.logout-button {
+  border-color: rgba(255, 146, 126, 0.24);
+  background: rgba(255, 146, 126, 0.1);
+  color: #ff927e;
+}
+
+.logout-button:hover {
+  background: #ff927e;
+  color: #28131e;
+}
+
+.tool-row {
+  border-color: rgba(255, 190, 220, 0.2);
+  background: rgba(31, 15, 26, 0.58);
+}
+
+.tool-row:hover {
+  border-color: rgba(255, 159, 200, 0.32);
+  background: rgba(50, 18, 36, 0.9);
+}
+
+.edit-modal {
+  border-color: rgba(255, 190, 220, 0.2);
+  background: rgba(24, 14, 20, 0.98);
+}
+
+@media (max-width: 640px) {
+  .login-box {
+    padding: 28px 20px;
+  }
+
+  .admin-header-actions {
+    align-self: flex-end;
+    margin-top: -52px;
+  }
+}
+
+/* Final RoKit dark theme overrides. */
+.admin-shell {
+  background: radial-gradient(circle at 50% 0%, rgba(34, 197, 94, 0.1), transparent 32%), #08090b;
+  background-image: radial-gradient(circle at 50% 0%, rgba(34, 197, 94, 0.1), transparent 32%);
+  background-attachment: fixed;
+}
+
+.admin-eyebrow {
+  color: #9ae6b4;
+}
+
+.admin-eyebrow span {
+  background: #22c55e;
+  box-shadow: 0 0 0 5px rgba(34, 197, 94, 0.14);
+}
+
+.admin-box input,
+.edit-modal input,
+.edit-modal textarea {
+  border-color: #2a2d33;
+  background: #090a0c;
+}
+
+.admin-box input:focus,
+.edit-modal input:focus,
+.edit-modal textarea:focus {
+  border-color: #22c55e;
+  box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.12);
+}
+
+.primary-button {
+  border-radius: 10px;
+  background: #22c55e;
+  border: 1px solid transparent;
+  color: #061109;
+  box-shadow: 0 10px 24px rgba(34, 197, 94, 0.18);
+  transition: background 160ms ease, border-color 160ms ease, color 160ms ease, transform 160ms ease, box-shadow 160ms ease;
+}
+
+.primary-button:hover {
+  background: #34d46b;
+  border-color: transparent;
+  color: #061109;
+  transform: translateY(-1px);
+  box-shadow: 0 14px 30px rgba(34, 197, 94, 0.26);
+}
+
+.add-button {
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.045);
+  border: 1px solid #2a2d33;
+  color: #d7d9dd;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.18);
+  transition: background 160ms ease, border-color 160ms ease, color 160ms ease, transform 160ms ease, box-shadow 160ms ease;
+}
+
+.add-button:hover {
+  background: rgba(34, 197, 94, 0.14);
+  border-color: rgba(34, 197, 94, 0.45);
+  color: #9ae6b4;
+  transform: translateY(-1px);
+  box-shadow: 0 12px 26px rgba(0, 0, 0, 0.25);
+}
+
+.login-box .back-link {
+  color: #aeb2b9;
+}
+
+.login-box .back-link:hover {
+  color: #d7d9dd;
+}
+
+.home-button {
+  border-color: #2a2d33;
+  background: rgba(16, 18, 22, 0.78);
+  color: #aeb2b9;
+}
+
+.home-button:hover {
+  border-color: rgba(34, 197, 94, 0.45);
+  background: rgba(16, 24, 19, 0.94);
+  color: #9ae6b4;
+}
+
+.logout-button {
+  border-color: rgba(239, 68, 68, 0.3);
+  background: rgba(239, 68, 68, 0.12);
+  color: #fca5a5;
+}
+
+.logout-button:hover {
+  border-color: rgba(239, 68, 68, 0.45);
+  background: rgba(239, 68, 68, 0.22);
+  color: #fecaca;
+}
+
+.tool-row {
+  border-color: #202328;
+  background: #0b0c0f;
+}
+
+.tool-row:hover {
+  border-color: #33353b;
+  background: #0f1013;
+}
+
+.edit-modal {
+  border-color: #292c32;
+  background: #0d0e11;
+}
