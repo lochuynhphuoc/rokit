@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  CircleAlert,
   Eye,
   EyeOff,
   Home,
@@ -42,6 +43,7 @@ export default function AdminPage() {
   const [saving, setSaving] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [loginLoading, setLoginLoading] = useState(false);
+  const [loginError, setLoginError] = useState(false);
 
   useEffect(() => {
     const savedPass = sessionStorage.getItem("rokit_admin_pass");
@@ -51,7 +53,7 @@ export default function AdminPage() {
     }
   }, []);
 
-  async function fetchTools(inputPass: string) {
+  async function fetchTools(inputPass: string): Promise<boolean> {
     try {
       const response = await fetch("/api/tools", {
         method: "POST",
@@ -62,14 +64,16 @@ export default function AdminPage() {
       if (!response.ok) {
         setMessage(data.error || "Unauthorized");
         setAuthenticated(false);
-        return;
+        return false;
       }
       setTools(Array.isArray(data.tools) ? data.tools : []);
       setAuthenticated(true);
       setMessage("");
+      return true;
     } catch {
       setMessage("Could not connect to the admin API.");
       setAuthenticated(false);
+      return false;
     }
   }
 
@@ -78,10 +82,16 @@ export default function AdminPage() {
       setMessage("Please enter the admin password.");
       return;
     }
-    sessionStorage.setItem("rokit_admin_pass", pass);
     setLoginLoading(true);
     try {
-      await fetchTools(pass);
+      const authenticated = await fetchTools(pass);
+      if (authenticated) {
+        sessionStorage.setItem("rokit_admin_pass", pass);
+        return;
+      }
+
+      setLoginError(true);
+      window.setTimeout(() => setLoginError(false), 2500);
     } finally {
       setLoginLoading(false);
     }
@@ -171,9 +181,13 @@ export default function AdminPage() {
               {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
             </button>
           </div>
-          <button className="primary-button" onClick={login} disabled={loginLoading}>
-            {loginLoading ? <LoaderCircle className="loading-icon" size={17} /> : <LogIn size={17} />}
-            {loginLoading ? "Authenticating..." : "Access dashboard"}
+          <button
+            className={`primary-button login-submit ${loginError ? "login-error" : ""}`}
+            onClick={login}
+            disabled={loginLoading}
+          >
+            {loginLoading ? <LoaderCircle className="loading-icon" size={17} /> : loginError ? <CircleAlert size={17} /> : <LogIn size={17} />}
+            {loginLoading ? "Authenticating..." : loginError ? "Unauthorized: Sai mật khẩu Admin!" : "Access dashboard"}
           </button>
           <a href="/" className="back-link home-link"><Home size={15} /> Back to homepage</a>
           {message ? <p className="admin-message error-message">{message}</p> : null}
