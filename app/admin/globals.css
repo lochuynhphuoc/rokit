@@ -422,38 +422,6 @@ button {
   font-size: 13px;
 }
 
-@media (max-width: 640px) {
-  .admin-shell {
-    align-items: start;
-    padding: 18px 12px;
-  }
-
-  .admin-box,
-  .edit-modal {
-    padding: 20px;
-  }
-
-  .admin-header-row,
-  .tool-row {
-    align-items: flex-start;
-    flex-direction: column;
-  }
-
-  .logout-button {
-    align-self: flex-end;
-    margin-top: -52px;
-  }
-
-  .tool-row {
-    gap: 14px;
-  }
-
-  .tool-row-controls {
-    width: 100%;
-    justify-content: flex-start;
-  }
-}
-
 /* Dark RoKit overrides for the RoCheck-inspired admin layout. */
 .admin-shell {
   background: radial-gradient(circle at 50% 0%, rgba(34, 197, 94, 0.1), transparent 32%), #08090b;
@@ -731,17 +699,6 @@ button {
   background: rgba(24, 14, 20, 0.98);
 }
 
-@media (max-width: 640px) {
-  .login-box {
-    padding: 28px 20px;
-  }
-
-  .admin-header-actions {
-    align-self: flex-end;
-    margin-top: -52px;
-  }
-}
-
 /* Final RoKit dark theme overrides. */
 .admin-shell {
   background: radial-gradient(circle at 50% 0%, rgba(34, 197, 94, 0.1), transparent 32%), #08090b;
@@ -860,4 +817,255 @@ button {
   color: #fff;
   box-shadow: 0 10px 24px rgba(239, 68, 68, 0.2);
   transform: none;
+}
+
+/* Final responsive layout */
+
+@media (max-width: 640px) {
+  .admin-shell {
+    min-height: 100dvh;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 16px 12px 32px;
+  }
+
+  .admin-box {
+    width: 100%;
+    max-width: 100%;
+    padding: 20px 16px;
+  }
+
+  .login-box {
+    width: 100%;
+    max-width: 480px;
+    padding: 28px 20px;
+  }
+
+  /* Header */
+
+  .admin-header-row {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+
+  .admin-header-row > div:first-child {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .admin-box h1 {
+    max-width: 100%;
+    font-size: 32px;
+    line-height: 1.05;
+    overflow-wrap: anywhere;
+  }
+
+  .admin-header-row .back-link {
+    margin-bottom: 0;
+  }
+
+  /* Home / Logout */
+
+  .admin-header-actions {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: stretch;
+    gap: 8px;
+    margin: 0;
+  }
+
+  .home-button,
+  .logout-button {
+    width: 100%;
+    min-width: 0;
+    min-height: 40px;
+    margin: 0;
+    justify-content: center;
+  }
+
+  /* Tool count / Add button */
+
+  .admin-actions {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 14px;
+  }
+
+  .admin-actions > span {
+    min-width: 0;
+  }
+
+  .add-button {
+    flex: 0 0 auto;
+    white-space: nowrap;
+  }
+
+  /* Tool list */
+
+  .tool-list {
+    width: 100%;
+    gap: 10px;
+  }
+
+  .tool-row {
+    width: 100%;
+    min-width: 0;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    gap: 12px;
+    padding: 13px;
+  }
+
+  /* Tool information */
+
+  .tool-row-left {
+    width: 100%;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 11px;
+  }
+
+  .tool-row-left img {
+    width: 40px;
+    height: 40px;
+    flex: 0 0 40px;
+  }
+
+  .tool-row-left > div {
+    min-width: 0;
+    flex: 1 1 auto;
+  }
+
+  .tool-row-left strong,
+  .tool-row-left small {
+    display: block;
+    width: 100%;
+    max-width: none;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  /* Tool controls */
+
+  .tool-row-controls {
+    width: 100%;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 9px;
+    padding-top: 10px;
+    border-top: 1px solid #202328;
+  }
+
+  .status-switch {
+    flex: 0 0 42px;
+  }
+
+  .status-label {
+    min-width: 0;
+    flex: 1 1 auto;
+  }
+
+  .icon-button {
+    flex: 0 0 34px;
+  }
+
+  /* Login */
+
+  .login-box .back-link {
+    width: 100%;
+    margin: 15px 0 0;
+    justify-content: center;
+  }
+
+  /* Modal */
+
+  .modal-backdrop {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 12px;
+    overflow-y: auto;
+  }
+
+  .edit-modal {
+    width: 100%;
+    max-width: 520px;
+    max-height: calc(100dvh - 24px);
+    padding: 20px 16px;
+    margin: 0;
+  }
+
+  .modal-header {
+    width: 100%;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .modal-header > div {
+    min-width: 0;
+  }
+
+  .edit-modal h2 {
+    font-size: 23px;
+    line-height: 1.1;
+  }
+}
+
+/* Small phones */
+
+@media (max-width: 380px) {
+  .admin-shell {
+    padding-left: 8px;
+    padding-right: 8px;
+  }
+
+  .admin-box {
+    padding-left: 13px;
+    padding-right: 13px;
+  }
+
+  .login-box {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  .admin-box h1 {
+    font-size: 29px;
+  }
+
+  .admin-header-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-actions {
+    align-items: stretch;
+  }
+
+  .admin-actions .add-button {
+    padding: 9px 10px;
+  }
+
+  .tool-row-controls {
+    gap: 7px;
+  }
 }
