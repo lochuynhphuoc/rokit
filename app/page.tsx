@@ -11,14 +11,14 @@ type Tool = {
 
 const tools: Tool[] = [
   {
-    name: "RoCheck",
+    name: "Ro-Check",
     description:
       "Check Roblox group membership quickly and efficiently.",
     url: "https://rocheck.vercel.app/",
     status: "available",
   },
   {
-    name: "RoLink Resolver",
+    name: "Ro-Link Resolver",
     description:
       "Resolve Roblox Share Links and extract their Roblox IDs.",
     url: "https://rolinkresolver.vercel.app/",
